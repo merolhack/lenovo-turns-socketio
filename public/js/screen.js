@@ -17,8 +17,10 @@
     // Use callback with functions
     getCurrentTurn(function(payload) {
         console.log('payload:', JSON.stringify(payload));
+        $('div.turno-activo span.turno-activo-codigo').text(payload.group + '' + payload.counter);
     });
     subscribeToCurrentTurn(function(err, payload) {
         console.log('currentTurn:', payload);
+        $('div.turno-siguiente span.codigo').text(payload.groupName + '' + payload.counter);
     });
 })(window.io, window.jQuery);

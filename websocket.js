@@ -55,12 +55,15 @@ io.on('connection', (client) => {
         };
         const latest = TurnModel.findOne(query).sort({counter: -1});
         let counter = 0;
+        let group = '';
         latest.exec((err, documentFound) => {
             if (err) return handleError(err);
             if (documentFound) {
+                console.log('documentFound:', documentFound);
                 counter = documentFound.counter;
+                group = documentFound.group;
             }
-            io.emit('current-turn', {counter});
+            io.emit('current-turn', {counter, group});
         });
     });
     client.on('create-turn', (payload) => {
