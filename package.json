@@ -1,0 +1,27 @@
+{
+  "name": "lenovo-turns-socketio",
+  "version": "1.0.0",
+  "description": "Socket.IO",
+  "main": "index.js",
+  "scripts": {
+    "start": "node websocket.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merolhack/lenovo-turns-socketio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/merolhack/lenovo-turns-socketio/issues"
+  },
+  "homepage": "https://github.com/merolhack/lenovo-turns-socketio#readme",
+  "devDependencies": {
+    "bluebird": "^3.5.1",
+    "express": "^4.16.2",
+    "ip": "^1.1.5",
+    "mongoose": "^4.13.4",
+    "socket.io": "^2.0.4"
+  }
+}
