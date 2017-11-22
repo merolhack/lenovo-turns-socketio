@@ -12,6 +12,7 @@ const app          = express();
 const db           = require('./db/connection');
 const TurnModel    = require('./db/models/turn');
 const ButtonModel  = require('./db/models/button');
+const WindowModel  = require('./db/models/window');
 const createTurn   = require('./db/createTurn');
 
 const handleError = function(error) {
@@ -42,6 +43,20 @@ io.on('connection', (client) => {
             if(documents.length > 0) {
                 io.emit('set-buttons', documents);
             }
+        });
+    });
+    // Set the active window
+    client.on('update-window-data', (payload) => {
+        console.log('payload:', payload);
+        WindowModel.findOneAndUpdate({'number': payload.number}, {
+            $set: {
+                username: payload.username
+            }
+        }, {
+            new: true
+        }, function (err, wind0w) {
+            if (err) return handleError(err);
+            io.emit('active-window-setted', wind0w);
         });
     });
     // Get the current turn of today
@@ -96,5 +111,8 @@ io.on('connection', (client) => {
             console.log('Turn that will be created:', turn);
             createTurn(turn, query, io, payload);
         });
+    });
+    client.on('request-turn', (payload) => {
+
     });
 });
