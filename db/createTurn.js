@@ -22,9 +22,8 @@ const createTurn = (turn, query, io, payload) => {
             createdPayload.counter = document.counter;
             console.log('createdPayload:', createdPayload);
             moment.locale('es');
-            const date = ucwords(moment(document.createdAt).format("dddd, MMMM D YYYY, h:mm:ss a"));
-            const space = '                                                                                                                      ';
-            const text = `${space} Su turno es: ${createdPayload.groupName}${createdPayload.counter} ${space} ${date} ${space} ${space} ${space} `;
+            const date = ucwords(moment(document.createdAt).format("dd, MMMM D YYYY, h:mm:ss a"));
+            const text = `           Motorola         \n\r      Su turno es: ${createdPayload.groupName}${createdPayload.counter} \n\r ${date}\n\r`;
             printer.printDirect({
                 data: text, // or simple String: "some text"
                 //printer:'Foxit Reader PDF Printer', // printer name, if missing then will print to default printer
