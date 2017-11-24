@@ -1,8 +1,13 @@
 /**
- * MongoDB Create document
+ * MongoDB: Create document
+ * Jimp: Create image
+ * Printer: Send an image to the printer
  */
+const path = require("path");
+const Jimp = require("jimp");
 const printer = require('printer');
 const moment = require('moment');
+const uuid = require('node-uuid');
 const TurnModel = require('./models/turn');
 
 function ucwords(str) {
@@ -10,6 +15,12 @@ function ucwords(str) {
         return $1.toUpperCase();
     });
 }
+
+const fileName = 'assets/img/BadwingMoto.jpg';
+const temporalDirectory = 'assets/delete';
+const imageCaption1 = 'Su turno es: ';
+const imageCaption2 = 'B i e n v e n i d o';
+let loadedImage;
 
 const createTurn = (turn, query, io, payload) => {
     TurnModel.create(turn)
@@ -21,20 +32,43 @@ const createTurn = (turn, query, io, payload) => {
             let createdPayload = payload;
             createdPayload.counter = document.counter;
             console.log('createdPayload:', createdPayload);
-            moment.locale('es');
-            const date = ucwords(moment(document.createdAt).format("dd, MMMM D YYYY, h:mm:ss a"));
-            const text = `           Motorola         \n\r      Su turno es: ${createdPayload.groupName}${createdPayload.counter} \n\r ${date}\n\r`;
-            printer.printDirect({
-                data: text, // or simple String: "some text"
-                //printer:'Foxit Reader PDF Printer', // printer name, if missing then will print to default printer
-                type: 'TEXT', // type: RAW, TEXT, PDF, JPEG, .. depends on platform
-                success: function(jobID){
-                    console.log(`sent to printer with ID: ${jobID}`);
-                },
-                error: function(err){
-                    console.log(err);
-                }
-            });
+
+            Jimp.read(fileName)
+                .then(function (image) {
+                    image.quality(100);
+                    loadedImage = image;
+                    return Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+                })
+                .then(function (font) {
+                    const temporalFileName = path.join(temporalDirectory, uuid.v1()) + '.jpg';
+                    console.log('temporalFileName:', temporalFileName);
+                    loadedImage.print(font, 46, 110, imageCaption2)
+                                .write(temporalFileName);
+            
+                    loadedImage.print(font, 40, 150, `${imageCaption1} ${createdPayload.groupName}${createdPayload.counter}`)
+                            .write(temporalFileName);
+            
+                    moment.locale('es');
+                    const date = ucwords(moment(new Date).format("hh:mm:ss A "));
+                    //const date = ucwords(moment(new Date).format("dd, MMMM D YYYY, h:mm:ss a"));
+                    loadedImage.print(font, 60, 185, date)
+                            .write(temporalFileName);
+            
+                    printer.printDirect({
+                        data: temporalFileName,
+                        type: 'JPEG',
+                        success: function(jobID){
+                            console.log(`sent to printer with ID: ${jobID}`);
+                        },
+                        error: function(err){
+                            console.log(err);
+                        }
+                    });
+                })
+                .catch(function (err) {
+                    console.error(err);
+                });
+            
             io.sockets.emit('turn-created', createdPayload);
         });
 };
