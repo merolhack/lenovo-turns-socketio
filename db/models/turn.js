@@ -22,6 +22,10 @@ const turnSchema = new mongoose.Schema({
     mobileDateCreated: {
         type: Date,
     },
+    completed: {
+        type: Boolean,
+        default: false,
+    },
     reset: {
         type: Boolean,
         default: false,

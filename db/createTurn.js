@@ -8,6 +8,8 @@ const Jimp = require("jimp");
 const printer = require('printer');
 const moment = require('moment');
 const uuid = require('node-uuid');
+const cmd = require('node-cmd');
+
 const TurnModel = require('./models/turn');
 
 function ucwords(str) {
@@ -21,7 +23,7 @@ const temporalDirectory = 'assets/delete';
 const imageCaption1 = 'Su turno es: ';
 const imageCaption2 = 'B i e n v e n i d o';
 let loadedImage;
-
+console.log('Supported:', printer.getSupportedPrintFormats())
 const createTurn = (turn, query, io, payload) => {
     TurnModel.create(turn)
         .then(() => {
@@ -53,8 +55,9 @@ const createTurn = (turn, query, io, payload) => {
                     //const date = ucwords(moment(new Date).format("dd, MMMM D YYYY, h:mm:ss a"));
                     loadedImage.print(font, 60, 185, date)
                             .write(temporalFileName);
-            
-                    printer.printDirect({
+                    
+                    cmd.run(`mspaint /pt ${temporalFileName} EC-80330`);
+                    /*printer.printDirect({
                         data: temporalFileName,
                         type: 'JPEG',
                         success: function(jobID){
@@ -63,7 +66,7 @@ const createTurn = (turn, query, io, payload) => {
                         error: function(err){
                             console.log(err);
                         }
-                    });
+                    });*/
                 })
                 .catch(function (err) {
                     console.error(err);

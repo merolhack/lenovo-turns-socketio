@@ -47,7 +47,7 @@ io.on('connection', (client) => {
     });
     // Set the active window
     client.on('update-window-data', (payload) => {
-        console.log('payload:', payload);
+        console.log('update-window-data: payload:', payload);
         WindowModel.findOneAndUpdate({'number': payload.number}, {
             $set: {
                 username: payload.username
@@ -68,7 +68,7 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latest = TurnModel.findOne(query).sort({counter: -1});
+        const latest = TurnModel.findOne(query).where("window").ne(null).sort({counter: -1});
         let counter = 0;
         let group = '';
         latest.exec((err, documentFound) => {
@@ -77,8 +77,9 @@ io.on('connection', (client) => {
                 console.log('documentFound:', documentFound);
                 counter = documentFound.counter;
                 group = documentFound.group;
+                wind0w = documentFound.window;
             }
-            io.emit('current-turn', {counter, group});
+            io.emit('current-turn', {counter, group, wind0w});
         });
     });
     client.on('create-turn', (payload) => {
@@ -113,6 +114,44 @@ io.on('connection', (client) => {
         });
     });
     client.on('request-turn', (payload) => {
-
+        console.log('request-turn | payload:', payload);
+        // Get the latest turn with no window selected
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+        const query = {
+            'group': payload.windowGroup,
+            'window': null,
+            'createdAt': {$gte: start, $lt: end}
+        };
+        TurnModel.findOneAndUpdate(query, {
+            $set: {
+                window: payload.windowId
+            }
+        }, {
+            new: true
+        }, function (err, documentFound) {
+            if (err) return handleError(err);
+            io.emit('current-turn', {documentFound});
+        });
+    });
+    client.on('complete-turn', (payload) => {
+        const query = {
+            'counter': payload.counter,
+            'window': payload.window,
+            'group': payload.group,
+        };
+        console.log('query:', query);
+        TurnModel.findOneAndUpdate(query, {
+            $set: {
+                completed: true
+            }
+        }, {
+            new: true
+        }, function (err, documentFound) {
+            if (err) return handleError(err);
+            io.emit('turn-completed', {documentFound});
+        });
     });
 });

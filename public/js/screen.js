@@ -18,6 +18,9 @@
     getCurrentTurn(function(payload) {
         console.log('payload:', JSON.stringify(payload));
         $('div.turno-activo span.turno-activo-codigo').text(payload.group + '' + payload.counter);
+        $('div.turno-activo span.turno-activo-modulo span').text(payload.wind0w);
+        var sound = document.getElementById("audio");
+        sound.play();
     });
     subscribeToCurrentTurn(function(err, payload) {
         console.log('currentTurn:', payload);
