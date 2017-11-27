@@ -68,7 +68,9 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latest = TurnModel.findOne(query).where("window").ne(null).sort({counter: -1});
+        const latest = TurnModel.findOne(query)
+            .where("window").ne(null)
+            .sort({counter: -1});
         let counter = 0;
         let group = '';
         let wind0w = 0;
@@ -138,10 +140,15 @@ io.on('connection', (client) => {
         });
     });
     client.on('complete-turn', (payload) => {
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
         const query = {
             'counter': payload.counter,
-            'window': payload.window,
-            'group': payload.group,
+            'window': payload.windowId,
+            'group': payload.windowGroup,
+            'createdAt': {$gte: start, $lt: end}
         };
         console.log('query:', query);
         TurnModel.findOneAndUpdate(query, {
@@ -154,5 +161,22 @@ io.on('connection', (client) => {
             if (err) return handleError(err);
             io.emit('turn-completed', {documentFound});
         });
+    });
+    client.on('get-next-turn', (payload) => {
+        // Get the latest turn
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+        const query = {
+            'createdAt': {$gte: start, $lt: end}
+        };
+        const latests = TurnModel.find(query).where('completed').equals(false).sort({counter: -1});
+        latests.exec((err, documentsFound) => {
+            console.log('documentsFound:', documentsFound);
+        });
+    });
+    client.on('request-previous-turn', (payload) => {
+
     });
 });

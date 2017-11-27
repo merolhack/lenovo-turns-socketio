@@ -30,6 +30,10 @@
         function subscribeToCurrentTurn(cb) {
             socket.on('turn-created', (payload) => cb(null, payload));
         }
+        function getNextTurn(cb) {
+            socket.emit('get-next-turn', {});
+            socket.on('set-next-turn', (payload) => cb(payload));
+        }
         // Use callback with functions
         getCurrentTurn(function(payload) {
             console.log('payload:', JSON.stringify(payload));
@@ -41,6 +45,9 @@
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
             $('div.turno-siguiente span.codigo').text(payload.groupName + '' + payload.counter);
+        });
+        getNextTurn(function(err, payload) {
+            console.log('nextTurn:', payload);
         });
     });
 })(window.io, window.jQuery, window.swal);
