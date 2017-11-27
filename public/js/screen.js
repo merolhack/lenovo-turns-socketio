@@ -1,12 +1,16 @@
 (function(io, $, swal) {
     'use strict';
 
-    setTimeout(function() {
-        $('.swal-content__input' ).val('127.0.0.1');
-    }, 300);
     swal({
         text: 'Ingrese la IP del panel de control:',
-        content: "input",
+        content: {
+            element: "input",
+            attributes: {
+                placeholder: "Ingrese la IP",
+                type: "text",
+                value: "192.168.1.134"
+            },
+        },
         button: {
             text: "Guardar",
             closeModal: true,
