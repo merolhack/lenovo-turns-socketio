@@ -71,6 +71,7 @@ io.on('connection', (client) => {
         const latest = TurnModel.findOne(query).where("window").ne(null).sort({counter: -1});
         let counter = 0;
         let group = '';
+        let wind0w = 0;
         latest.exec((err, documentFound) => {
             if (err) return handleError(err);
             if (documentFound) {
