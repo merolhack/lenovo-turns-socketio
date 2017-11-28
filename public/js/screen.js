@@ -72,6 +72,8 @@
             } else {
                 $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
                 $('.turno-activo-modulo span').text(payload.documentFound.window);
+                var sound = document.getElementById("audio");
+                sound.play();
             }
         });
         getNextTurn(function(payload) {
