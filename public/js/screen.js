@@ -21,7 +21,7 @@
             attributes: {
                 placeholder: "Ingrese la IP",
                 type: "text",
-                value: "192.168.1.134"
+                value: "192.168.1.87"
             },
         },
         button: {
