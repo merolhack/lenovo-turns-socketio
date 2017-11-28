@@ -41,7 +41,7 @@
             socket.on('current-turn', (payload) => cb(payload));
         }
         function subscribeToCurrentTurn(cb) {
-            socket.on('turn-created', (payload) => cb(null, payload));
+            socket.on('set-requested-turn', (payload) => cb(null, payload));
         }
         function getNextTurn(cb) {
             socket.emit('get-next-turn', {});
@@ -54,14 +54,15 @@
         // Use callback with functions
         getCurrentTurn(function(payload) {
             console.log('payload:', JSON.stringify(payload));
-            $('div.turno-activo span.turno-activo-codigo').text(payload.group + '' + payload.counter);
-            $('div.turno-activo span.turno-activo-modulo span').text(payload.wind0w);
+            $('.turno-activo-codigo').text(payload.group + '' + payload.counter);
+            $('.turno-activo-modulo span').text(payload.wind0w);
             var sound = document.getElementById("audio");
             sound.play();
         });
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
-            $('div.turno-siguiente span.codigo').text(payload.groupName + '' + payload.counter);
+            $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
+            $('.turno-activo-modulo span').text(payload.documentFound.window);
         });
         getNextTurn(function(err, payload) {
             console.log('getNextTurn:', payload);

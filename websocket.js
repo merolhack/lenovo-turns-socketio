@@ -172,7 +172,7 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('completed').equals(false).sort({counter: -1});
+        const latests = TurnModel.find(query).where('window').ne(null).sort({counter: -1});
         latests.exec((err, documentsFound) => {
             console.log('get-next-turn | documentsFound:', documentsFound);
         });
@@ -186,7 +186,7 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('completed').equals(false).sort({counter: -1});
+        const latests = TurnModel.find(query).where('window').ne(null).sort({counter: -1});
         latests.exec((err, documentsFound) => {
             console.log('get-previous-turn | documentsFound:', documentsFound);
         });
