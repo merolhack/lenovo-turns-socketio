@@ -174,7 +174,9 @@ io.on('connection', (client) => {
         };
         const latests = TurnModel.find(query).where('window').ne(null).sort({counter: -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-next-turn | documentsFound:', documentsFound);
+            console.log('get-next-turn | documentsFound:', documentsFound[1]);
+            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
+            io.emit('set-next-turn', {document});
         });
     });
     client.on('get-previous-turn', (payload) => {
@@ -188,7 +190,9 @@ io.on('connection', (client) => {
         };
         const latests = TurnModel.find(query).where('window').ne(null).sort({counter: -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-previous-turn | documentsFound:', documentsFound);
+            console.log('get-previous-turn | documentsFound:', documentsFound[2]);
+            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[2] !== null) ? documentsFound[2] : null;
+            io.emit('set-previous-turn', {document});
         });
     });
 });

@@ -66,9 +66,13 @@
         });
         getNextTurn(function(err, payload) {
             console.log('getNextTurn:', payload);
+            $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
+            $('.turno-siguiente .modulo span').text(payload.document.window);
         });
         getPreviousTurn(function(err, payload) {
             console.log('getPreviousTurn:', payload);
+            $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
+            $('.turno-anterior .modulo span').text(payload.document.window);
         });
     });
 })(window.io, window.jQuery, window.swal);
