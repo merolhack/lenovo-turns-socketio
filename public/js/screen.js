@@ -98,6 +98,7 @@
         });
         getTurnCompleted(function(payload) {
             console.log('setTurnCompleted:', payload);
+            socket.emit('get-turn', {completed: false});
             socket.emit('get-next-turn', {});
             socket.emit('get-previous-turn', {});
         });

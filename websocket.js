@@ -179,7 +179,8 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('window').ne(null).where('completed').ne(false).sort({counter: -1});
+        const latests = TurnModel.find(query).where('window').ne(null)
+            .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
             console.log('get-next-turn | documentsFound:', documentsFound[1]);
             const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
@@ -195,7 +196,8 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('window').ne(null).where('completed').ne(false).sort({counter: -1});
+        const latests = TurnModel.find(query).where('window').ne(null)
+            .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
             console.log('get-previous-turn | documentsFound:', documentsFound[2]);
             const document = (typeof documentsFound[1] !== "undefined" && documentsFound[2] !== null) ? documentsFound[2] : null;
