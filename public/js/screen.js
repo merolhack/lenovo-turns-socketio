@@ -37,7 +37,7 @@
         const socket = io(url, options);
         // Define functions
         function getCurrentTurn(cb) {
-            socket.emit('get-turn', {});
+            socket.emit('get-turn', {completed: true});
             socket.on('current-turn', (payload) => cb(payload));
         }
         function subscribeToCurrentTurn(cb) {
@@ -51,6 +51,11 @@
             socket.emit('get-previous-turn', {});
             socket.on('set-previous-turn', (payload) => cb(payload));
         }
+        function getTurnCompleted(cb) {
+            socket.emit('get-next-turn', {});
+            socket.emit('get-previous-turn', {});
+            socket.on('turn-completed', (payload) => cb(payload));
+        };
         // Use callback with functions
         getCurrentTurn(function(payload) {
             console.log('payload:', JSON.stringify(payload));
@@ -61,18 +66,38 @@
         });
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
-            $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
-            $('.turno-activo-modulo span').text(payload.documentFound.window);
+            if (payload.documentFound === null) {
+                $('.turno-activo-codigo').text('');
+                $('.turno-activo-modulo span').text('');
+            } else {
+                $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
+                $('.turno-activo-modulo span').text(payload.documentFound.window);
+            }
         });
-        getNextTurn(function(err, payload) {
+        getNextTurn(function(payload) {
             console.log('getNextTurn:', payload);
-            $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
-            $('.turno-siguiente .modulo span').text(payload.document.window);
+            if (typeof payload !== "undefined") {
+                $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
+                $('.turno-siguiente .modulo span').text(payload.document.window);
+            } else {
+                $('.turno-siguiente .codigo').text('');
+                $('.turno-siguiente .modulo span').text('');
+            }
         });
-        getPreviousTurn(function(err, payload) {
+        getPreviousTurn(function(payload) {
             console.log('getPreviousTurn:', payload);
-            $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
-            $('.turno-anterior .modulo span').text(payload.document.window);
+            if (typeof payload !== "undefined") {
+                $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
+                $('.turno-anterior .modulo span').text(payload.document.window);
+            } else {
+                $('.turno-anterior .codigo').text('');
+                $('.turno-anterior .modulo span').text('');
+            }
+        });
+        getTurnCompleted(function(payload) {
+            console.log('setTurnCompleted:', payload);
+            socket.emit('get-next-turn', {});
+            socket.emit('get-previous-turn', {});
         });
     });
 })(window.io, window.jQuery, window.swal);
