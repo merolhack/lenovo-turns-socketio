@@ -1,6 +1,19 @@
 (function(io, $, swal) {
     'use strict';
 
+    /**
+     * Set the initial values of the turns
+     */
+    // Current turn
+    $('.turno-activo-codigo').text(0);
+    $('.turno-activo-modulo span').text(0);
+    // Next turn
+    $('.turno-siguiente .codigo').text(0);
+    $('.turno-siguiente .modulo span').text(0);
+    // Previous turn
+    $('.turno-anterior .codigo').text(0);
+    $('.turno-anterior .modulo span').text(0);
+
     swal({
         text: 'Ingrese la IP del panel de control:',
         content: {
@@ -34,6 +47,10 @@
             socket.emit('get-next-turn', {});
             socket.on('set-next-turn', (payload) => cb(payload));
         }
+        function getPreviousTurn(cb) {
+            socket.emit('get-previous-turn', {});
+            socket.on('set-previous-turn', (payload) => cb(payload));
+        }
         // Use callback with functions
         getCurrentTurn(function(payload) {
             console.log('payload:', JSON.stringify(payload));
@@ -47,7 +64,10 @@
             $('div.turno-siguiente span.codigo').text(payload.groupName + '' + payload.counter);
         });
         getNextTurn(function(err, payload) {
-            console.log('nextTurn:', payload);
+            console.log('getNextTurn:', payload);
+        });
+        getPreviousTurn(function(err, payload) {
+            console.log('getPreviousTurn:', payload);
         });
     });
 })(window.io, window.jQuery, window.swal);

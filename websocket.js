@@ -136,7 +136,8 @@ io.on('connection', (client) => {
             new: true
         }, function (err, documentFound) {
             if (err) return handleError(err);
-            io.emit('current-turn', {documentFound});
+            console.log('request-turn | documentFound:', documentFound);
+            io.emit('set-requested-turn', {documentFound});
         });
     });
     client.on('complete-turn', (payload) => {
@@ -173,10 +174,21 @@ io.on('connection', (client) => {
         };
         const latests = TurnModel.find(query).where('completed').equals(false).sort({counter: -1});
         latests.exec((err, documentsFound) => {
-            console.log('documentsFound:', documentsFound);
+            console.log('get-next-turn | documentsFound:', documentsFound);
         });
     });
-    client.on('request-previous-turn', (payload) => {
-
+    client.on('get-previous-turn', (payload) => {
+        // Get the latest turn
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+        const query = {
+            'createdAt': {$gte: start, $lt: end}
+        };
+        const latests = TurnModel.find(query).where('completed').equals(false).sort({counter: -1});
+        latests.exec((err, documentsFound) => {
+            console.log('get-previous-turn | documentsFound:', documentsFound);
+        });
     });
 });
