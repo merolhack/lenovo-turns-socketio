@@ -68,15 +68,24 @@
                 $('.turno-activo-codigo').text('');
                 $('.turno-activo-modulo span').text('');
             } else {
-                $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
-                $('.turno-activo-modulo span').text(payload.documentFound.window);
+                // Get the current text
+                const currentTurn = $('.turno-activo-codigo').text();
+                const currentModule = $('.turno-activo-modulo span').text();
+                if (
+                    payload.documentFound.group + ' ' + payload.documentFound.counter !== currentTurn
+                    &&
+                    payload.documentFound.window !== currentModule
+                ) {
+                    $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
+                    $('.turno-activo-modulo span').text(payload.documentFound.window);
+                    var sound = document.getElementById("audio");
+                    sound.play();
+                }
             }
-            var sound = document.getElementById("audio");
-            sound.play();
         });
         getNextTurn(function(payload) {
             console.log('getNextTurn:', payload);
-            if (typeof payload !== "undefined") {
+            if (typeof payload !== "undefined" && payload.document !== null) {
                 $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
                 $('.turno-siguiente .modulo span').text(payload.document.window);
             } else {
@@ -86,7 +95,7 @@
         });
         getPreviousTurn(function(payload) {
             console.log('getPreviousTurn:', payload);
-            if (typeof payload !== "undefined") {
+            if (typeof payload !== "undefined" && payload.document !== null) {
                 $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
                 $('.turno-anterior .modulo span').text(payload.document.window);
             } else {
@@ -96,7 +105,7 @@
         });
         getTurnCompleted(function(payload) {
             console.log('setTurnCompleted:', payload);
-            socket.emit('get-turn', {completed: false});
+            socket.emit('get-turn', {});
             socket.emit('get-next-turn', {});
             socket.emit('get-previous-turn', {});
         });

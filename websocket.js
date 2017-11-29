@@ -76,6 +76,7 @@ io.on('connection', (client) => {
         }
         const latest = TurnModel.findOne(query)
             .where("window").ne(0)
+            .where("completed").equals(false)
             .sort({counter: -1});
         let counter = 0;
         let group = '';
@@ -181,11 +182,13 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('window').ne(null)
+        const latests = TurnModel.find(query)
+            .where('window').ne(0)
+            .where("completed").equals(true)
             .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-next-turn | documentsFound:', documentsFound[1]);
-            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
+            console.log('get-next-turn | documentsFound:', documentsFound[0]);
+            const document = (typeof documentsFound[0] !== "undefined" && documentsFound[0] !== null) ? documentsFound[0] : null;
             io.sockets.emit('set-next-turn', {document});
         });
     });
@@ -198,11 +201,13 @@ io.on('connection', (client) => {
         const query = {
             'createdAt': {$gte: start, $lt: end}
         };
-        const latests = TurnModel.find(query).where('window').ne(null)
+        const latests = TurnModel.find(query)
+            .where('window').ne(0)
+            .where("completed").equals(true)
             .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-previous-turn | documentsFound:', documentsFound[2]);
-            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[2] !== null) ? documentsFound[2] : null;
+            console.log('get-previous-turn | documentsFound:', documentsFound[1]);
+            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
             io.sockets.emit('set-previous-turn', {document});
         });
     });
