@@ -73,7 +73,7 @@ io.on('connection', (client) => {
             query.completed = false;
         }
         const latest = TurnModel.findOne(query)
-            .where("window").ne(null)
+            .where("window").ne(0)
             .sort({counter: -1});
         let counter = 0;
         let group = '';
@@ -115,7 +115,7 @@ io.on('connection', (client) => {
             const turn = {
                 counter: latestTurn,
                 group: payload.groupName,
-                window: undefined,
+                window: 0,
             };
             console.log('Turn that will be created:', turn);
             createTurn(turn, query, io, payload);
@@ -130,7 +130,7 @@ io.on('connection', (client) => {
         end.setHours(23,59,59,999);
         const query = {
             'group': payload.windowGroup,
-            'window': null,
+            'window': 0,
             'createdAt': {$gte: start, $lt: end}
         };
         TurnModel.findOneAndUpdate(query, {
