@@ -34,6 +34,8 @@ app.use(express.static('public'));
 let io             = require('socket.io')(server, {
     path: '/turns'
 });
+io.sockets.setMaxListeners(0);
+
 // Emitting events to the client
 io.on('connection', (client) => {
     console.log('Socket.IO: Client connected');
@@ -165,7 +167,7 @@ io.on('connection', (client) => {
             new: true
         }, (err, documentFound) => {
             console.log('documentFound:', documentFound);
-            io.emit('turn-completed', {payload: documentFound});
+            io.sockets.emit('turn-completed', {payload: documentFound});
             io.emit('get-next-turn', {});
             io.emit('get-previous-turn', {});
         });
@@ -184,7 +186,7 @@ io.on('connection', (client) => {
         latests.exec((err, documentsFound) => {
             console.log('get-next-turn | documentsFound:', documentsFound[1]);
             const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
-            io.emit('set-next-turn', {document});
+            io.sockets.emit('set-next-turn', {document});
         });
     });
     client.on('get-previous-turn', (payload) => {
@@ -201,7 +203,7 @@ io.on('connection', (client) => {
         latests.exec((err, documentsFound) => {
             console.log('get-previous-turn | documentsFound:', documentsFound[2]);
             const document = (typeof documentsFound[1] !== "undefined" && documentsFound[2] !== null) ? documentsFound[2] : null;
-            io.emit('set-previous-turn', {document});
+            io.sockets.emit('set-previous-turn', {document});
         });
     });
 });
