@@ -52,8 +52,6 @@
             socket.on('set-previous-turn', (payload) => cb(payload));
         }
         function getTurnCompleted(cb) {
-            socket.emit('get-next-turn', {});
-            socket.emit('get-previous-turn', {});
             socket.on('turn-completed', (payload) => cb(payload));
         };
         // Use callback with functions
@@ -72,9 +70,9 @@
             } else {
                 $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
                 $('.turno-activo-modulo span').text(payload.documentFound.window);
-                var sound = document.getElementById("audio");
-                sound.play();
             }
+            var sound = document.getElementById("audio");
+            sound.play();
         });
         getNextTurn(function(payload) {
             console.log('getNextTurn:', payload);
