@@ -262,7 +262,8 @@ io.on('connection', (client) => {
         };
         const latests = TurnModel.find(query)
             .where('window').ne(0)
-            .sort({'updatedAt': -1});
+            .sort({'updatedAt': -1})
+            .limit(6);
         latests.exec((err, documentsFound) => {
             console.log('get-latests-turns | documentsFound:', documentsFound);
             io.sockets.emit('set-latests-turns', {documentsFound});
