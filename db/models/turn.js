@@ -30,7 +30,13 @@ const turnSchema = new mongoose.Schema({
     reset: {
         type: Boolean,
         default: false,
-    }
+    },
+    username: {
+        type: String,
+        trim: true,
+        required: false,
+        default: '',
+    },
 }, {
     timestamps: true
 });
