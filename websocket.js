@@ -221,8 +221,8 @@ io.on('connection', (client) => {
             .where("completed").equals(false)
             .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-next-turn | documentsFound:', documentsFound[0]);
-            const document = (typeof documentsFound[0] !== "undefined" && documentsFound[0] !== null) ? documentsFound[0] : null;
+            console.log('get-next-turn | documentsFound:', documentsFound[1]);
+            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
             io.sockets.emit('set-next-turn', {document});
         });
     });
@@ -243,9 +243,29 @@ io.on('connection', (client) => {
             .where("completed").equals(false)
             .sort({'updatedAt': -1});
         latests.exec((err, documentsFound) => {
-            console.log('get-previous-turn | documentsFound:', documentsFound[1]);
-            const document = (typeof documentsFound[1] !== "undefined" && documentsFound[1] !== null) ? documentsFound[1] : null;
+            console.log('get-previous-turn | documentsFound:', documentsFound[2]);
+            const document = (typeof documentsFound[2] !== "undefined" && documentsFound[2] !== null) ? documentsFound[2] : null;
             io.sockets.emit('set-previous-turn', {document});
+        });
+    });
+    /**
+     * Screen App: Get the latest turns
+     */
+    client.on('get-latest-turns', (payload) => {
+        // Get the latest turn
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+        const query = {
+            'createdAt': {$gte: start, $lt: end}
+        };
+        const latests = TurnModel.find(query)
+            .where('window').ne(0)
+            .sort({'updatedAt': -1});
+        latests.exec((err, documentsFound) => {
+            console.log('get-latest-turns | documentsFound:', documentsFound);
+            io.sockets.emit('set-latest-turns', {documentsFound});
         });
     });
 });
