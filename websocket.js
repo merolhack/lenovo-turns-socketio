@@ -38,7 +38,8 @@ let io             = require('socket.io')(server, {
 io.sockets.setMaxListeners(0);
 // Emitting events to the client
 io.on('connection', (client) => {
-    console.log('Socket.IO: Client connected - ' + socket.request.connection.remoteAddress);
+    var clientIp = client.request.connection.remoteAddress;
+    console.log('Socket.IO: Client connected.' + clientIp);
     /**
      * Mobile App: Get the buttons from the buttons collection
      */
@@ -115,22 +116,24 @@ io.on('connection', (client) => {
             'window': 0,
             'createdAt': {$gte: start, $lt: end}
         };
-        /**
-         * const latests = TurnModel.find(query)
-            .where('window').ne(0)
-            .where("completed").equals(true)
+        const latests = TurnModel.find(query)
+            .where('window').equals(0)
+            .where("completed").equals(false)
             .sort({'updatedAt': -1});
-         */
-        TurnModel.findOneAndUpdate(query, {
-            $set: {
-                window: payload.windowId
-            }
-        }, {
-            new: true
-        }, function (err, documentFound) {
+        latests.exec((err, documentsFound) => {
             if (err) return handleError(err);
-            console.log('request-turn | documentFound:', documentFound);
-            io.emit('set-requested-turn', {documentFound});
+            console.log('request-turn | latests:', documentsFound);
+            // Latest
+            TurnModel.findByIdAndUpdate(documentsFound[documentsFound.length - 1]._id, {
+                    username: payload.windowUsername,
+                    window: payload.windowId,
+            }, {
+                new: true
+            }, function (err, documentFound) {
+                if (err) return handleError(err);
+                console.log('request-turn | documentFound:', documentFound);
+                io.emit('set-requested-turn', {documentFound});
+            });
         });
     });
     /**
