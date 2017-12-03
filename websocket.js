@@ -34,12 +34,14 @@ app.use(express.static('public'));
 let io             = require('socket.io')(server, {
     path: '/turns'
 });
+// Allow ilimited listeners
 io.sockets.setMaxListeners(0);
-
 // Emitting events to the client
 io.on('connection', (client) => {
-    console.log('Socket.IO: Client connected');
-    // Get the current turn of today
+    console.log('Socket.IO: Client connected - ' + socket.request.connection.remoteAddress);
+    /**
+     * Mobile App: Get the buttons from the buttons collection
+     */
     client.on('get-buttons', () => {
         ButtonModel.find().sort({order: -1}).then((documents) => {
             if(documents.length > 0) {
@@ -47,51 +49,9 @@ io.on('connection', (client) => {
             }
         });
     });
-    // Set the active window
-    client.on('update-window-data', (payload) => {
-        console.log('update-window-data: payload:', payload);
-        WindowModel.findOneAndUpdate({'number': payload.number}, {
-            $set: {
-                username: payload.username
-            }
-        }, {
-            new: true
-        }, function (err, wind0w) {
-            if (err) return handleError(err);
-            io.emit('active-window-setted', wind0w);
-        });
-    });
-    // Get the current turn of today
-    client.on('get-turn', (completed) => {
-        console.log('get-turn | completed:', completed);
-        const start = new Date();
-        start.setHours(0,0,0,0);
-        const end = new Date();
-        end.setHours(23,59,59,999);
-        const query = {
-            'createdAt': {$gte: start, $lt: end}
-        };
-        if (completed === true) {
-            query.completed = false;
-        }
-        const latest = TurnModel.findOne(query)
-            .where("window").ne(0)
-            .where("completed").equals(false)
-            .sort({counter: -1});
-        let counter = 0;
-        let group = '';
-        let wind0w = 0;
-        latest.exec((err, documentFound) => {
-            if (err) return handleError(err);
-            if (documentFound) {
-                console.log('documentFound:', documentFound);
-                counter = documentFound.counter;
-                group = documentFound.group;
-                wind0w = documentFound.window;
-            }
-            io.emit('current-turn', {counter, group, wind0w});
-        });
-    });
+    /**
+     * Mobile App: Create a turn in the turns collections
+     */
     client.on('create-turn', (payload) => {
         console.log('create-turn | payload:', JSON.stringify(payload));
         // Get the latest turn of that group in the current day
@@ -124,6 +84,25 @@ io.on('connection', (client) => {
             createTurn(turn, query, io, payload);
         });
     });
+    /**
+     * Window App: Set the active window
+     */
+    client.on('update-window-data', (payload) => {
+        console.log('update-window-data: payload:', payload);
+        WindowModel.findOneAndUpdate({'number': payload.number}, {
+            $set: {
+                username: payload.username
+            }
+        }, {
+            new: true
+        }, function (err, wind0w) {
+            if (err) return handleError(err);
+            io.emit('active-window-setted', wind0w);
+        });
+    });
+    /**
+     * Window App: Request a turn
+     */
     client.on('request-turn', (payload) => {
         console.log('request-turn | payload:', payload);
         // Get the latest turn with no window selected
@@ -136,6 +115,12 @@ io.on('connection', (client) => {
             'window': 0,
             'createdAt': {$gte: start, $lt: end}
         };
+        /**
+         * const latests = TurnModel.find(query)
+            .where('window').ne(0)
+            .where("completed").equals(true)
+            .sort({'updatedAt': -1});
+         */
         TurnModel.findOneAndUpdate(query, {
             $set: {
                 window: payload.windowId
@@ -148,6 +133,9 @@ io.on('connection', (client) => {
             io.emit('set-requested-turn', {documentFound});
         });
     });
+    /**
+     * Window App: Complete a turn
+     */
     client.on('complete-turn', (payload) => {
         const start = new Date();
         start.setHours(0,0,0,0);
@@ -173,6 +161,42 @@ io.on('connection', (client) => {
             io.emit('get-previous-turn', {});
         });
     });
+    /**
+     * Screen App: Get the latest "uncompleted" turn of today
+     */
+    client.on('get-turn', (completed) => {
+        console.log('get-turn | completed:', completed);
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+        const query = {
+            'createdAt': {$gte: start, $lt: end}
+        };
+        if (completed === true) {
+            query.completed = false;
+        }
+        const latest = TurnModel.findOne(query)
+            .where("window").ne(0)
+            .where("completed").equals(false)
+            .sort({counter: -1});
+        let counter = 0;
+        let group = '';
+        let wind0w = 0;
+        latest.exec((err, documentFound) => {
+            if (err) return handleError(err);
+            if (documentFound) {
+                console.log('documentFound:', documentFound);
+                counter = documentFound.counter;
+                group = documentFound.group;
+                wind0w = documentFound.window;
+            }
+            io.emit('current-turn', {counter, group, wind0w});
+        });
+    });
+    /**
+     * Screen App: Get the next "completed" turn of today
+     */
     client.on('get-next-turn', (payload) => {
         // Get the latest turn
         const start = new Date();
@@ -192,6 +216,9 @@ io.on('connection', (client) => {
             io.sockets.emit('set-next-turn', {document});
         });
     });
+    /**
+     * Screen App: Get the next "completed" turn of today
+     */
     client.on('get-previous-turn', (payload) => {
         // Get the latest turn
         const start = new Date();
