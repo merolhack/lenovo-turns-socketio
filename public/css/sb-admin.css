@@ -125,6 +125,7 @@ body.fixed-nav {
   text-align:center;
   line-height:1.5;
   font-size:19px;
+  border-radius:10px;
 }
 .turno-historial .title{
   font-size:1.4em;
