@@ -60,7 +60,10 @@
         };
         // Update the table with the latest turn
         function updateTable(modul3, counter) {
-            $('#historial').append('<tr><td>' + historyModule+'</td><td>'+historyTurn+'</td></tr>');
+            $('#historial tbody').append('<tr>\
+                <td><span class="codigos">'+counter+'</span></td>\
+                <td width="70%" class="modulo">Módulo: <span>'+modul3+'</span></td>\
+            </tr>');
         };
         // Use callback with functions
         getCurrentTurn(function(payload) {
@@ -93,7 +96,7 @@
                 }
             });*/
             getLatestTurn(function(payload) {
-                $('#historial').empty();
+                $('#historial tbody').empty();
                 _.each(payload.documentsFound, function(element, index) {
                     const historyModule = 'Modulo: '+element.window;
                     const historyTurn = element.window+' '+element.counter;
@@ -125,10 +128,10 @@
             //socket.emit('get-next-turn', {});
             //socket.emit('get-previous-turn', {});
             getLatestTurn(function(payload) {
-                $('#historial').empty();
+                $('#historial tbody').empty();
                 _.each(payload.documentsFound, function(element, index) {
                     const historyModule = 'Modulo: '+element.window;
-                    const historyTurn = element.window+' '+element.counter;
+                    const historyTurn = element.window+''+element.counter;
                     updateTable(historyModule, historyTurn);
                 });
             });
