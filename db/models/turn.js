@@ -18,6 +18,7 @@ const turnSchema = new mongoose.Schema({
     window: {
         type: Number,
         required: false,
+        default: 0,
     },
     mobileDateCreated: {
         type: Date,
