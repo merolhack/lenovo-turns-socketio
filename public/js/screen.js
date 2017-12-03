@@ -45,7 +45,7 @@
         }
         function getLatestTurn(cb) {
             socket.emit('get-latests-turns', {});
-            socket.on('set-latests-turn', (payload) => cb(payload));
+            socket.on('set-latests-turns', (payload) => cb(payload));
         }
         /*function getNextTurn(cb) {
             socket.emit('get-next-turn', {});
@@ -59,17 +59,26 @@
             socket.on('turn-completed', (payload) => cb(payload));
         };
         // Update the table with the latest turn
-        function updateTable(modul3, counter) {
-            $('#historial tbody').append('<tr>\
-                <td><span class="codigos">'+counter+'</span></td>\
-                <td width="70%" class="modulo">Módulo: <span>'+modul3+'</span></td>\
-            </tr>');
+        function updateTable(payload) {
+            $('#historial tbody').empty();
+            console.log('updateTable | payload:', payload);
+            _.each(payload.documentsFound, function(element, index) {
+                const historyTurn = element.group+''+element.counter;
+                $('#historial tbody').append('<tr>\
+                    <td><span class="codigos">'+historyTurn+'</span></td>\
+                    <td width="70%" class="modulo">Módulo: <span>'+element.window+'</span></td>\
+                </tr>'); 
+            });
         };
         // Use callback with functions
         getCurrentTurn(function(payload) {
             console.log('payload:', JSON.stringify(payload));
             $('.turno-activo-codigo').text(payload.group + '' + payload.counter);
             $('.turno-activo-modulo span').text(payload.wind0w);
+            getLatestTurn(function(latestPayload) {
+                console.log('latestPayload:', latestPayload);
+                updateTable(latestPayload);
+            });
             var sound = document.getElementById("audio");
             sound.play();
         });
@@ -95,13 +104,8 @@
                     $('.turno-anterior .modulo span').text('');
                 }
             });*/
-            getLatestTurn(function(payload) {
-                $('#historial tbody').empty();
-                _.each(payload.documentsFound, function(element, index) {
-                    const historyModule = 'Modulo: '+element.window;
-                    const historyTurn = element.window+' '+element.counter;
-                    updateTable(historyModule, historyTurn);
-                });
+            getLatestTurn(function(latestPayload) {
+                updateTable(latestPayload);
             });
             if (payload.documentFound === null) {
                 $('.turno-activo-codigo').text('');
@@ -127,13 +131,8 @@
             socket.emit('get-turn', {});
             //socket.emit('get-next-turn', {});
             //socket.emit('get-previous-turn', {});
-            getLatestTurn(function(payload) {
-                $('#historial tbody').empty();
-                _.each(payload.documentsFound, function(element, index) {
-                    const historyModule = 'Modulo: '+element.window;
-                    const historyTurn = element.window+''+element.counter;
-                    updateTable(historyModule, historyTurn);
-                });
+            getLatestTurn(function(latestPayload) {
+                updateTable(latestPayload);
             });
         });
     });
