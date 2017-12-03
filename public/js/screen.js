@@ -1,4 +1,4 @@
-(function(io, $, swal) {
+(function(io, $, swal, _) {
     'use strict';
 
     /**
@@ -43,16 +43,24 @@
         function subscribeToCurrentTurn(cb) {
             socket.on('set-requested-turn', (payload) => cb(null, payload));
         }
-        function getNextTurn(cb) {
+        function getLatestTurn(cb) {
+            socket.emit('get-latests-turns', {});
+            socket.on('set-latests-turn', (payload) => cb(payload));
+        }
+        /*function getNextTurn(cb) {
             socket.emit('get-next-turn', {});
             socket.on('set-next-turn', (payload) => cb(payload));
         }
         function getPreviousTurn(cb) {
             socket.emit('get-previous-turn', {});
             socket.on('set-previous-turn', (payload) => cb(payload));
-        }
+        }*/
         function getTurnCompleted(cb) {
             socket.on('turn-completed', (payload) => cb(payload));
+        };
+        // Update the table with the latest turn
+        function updateTable(modul3, counter) {
+            $('#historial').append('<tr><td>' + historyModule+'</td><td>'+historyTurn+'</td></tr>');
         };
         // Use callback with functions
         getCurrentTurn(function(payload) {
@@ -64,7 +72,7 @@
         });
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
-            getNextTurn(function(payload) {
+            /*getNextTurn(function(payload) {
                 console.log('getNextTurn:', payload);
                 if (typeof payload !== "undefined" && payload.document !== null) {
                     $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
@@ -83,6 +91,14 @@
                     $('.turno-anterior .codigo').text('');
                     $('.turno-anterior .modulo span').text('');
                 }
+            });*/
+            getLatestTurn(function(payload) {
+                $('#historial').empty();
+                _.each(payload.documentsFound, function(element, index) {
+                    const historyModule = 'Modulo: '+element.window;
+                    const historyTurn = element.window+' '+element.counter;
+                    updateTable(historyModule, historyTurn);
+                });
             });
             if (payload.documentFound === null) {
                 $('.turno-activo-codigo').text('');
@@ -106,8 +122,16 @@
         getTurnCompleted(function(payload) {
             console.log('setTurnCompleted:', payload);
             socket.emit('get-turn', {});
-            socket.emit('get-next-turn', {});
-            socket.emit('get-previous-turn', {});
+            //socket.emit('get-next-turn', {});
+            //socket.emit('get-previous-turn', {});
+            getLatestTurn(function(payload) {
+                $('#historial').empty();
+                _.each(payload.documentsFound, function(element, index) {
+                    const historyModule = 'Modulo: '+element.window;
+                    const historyTurn = element.window+' '+element.counter;
+                    updateTable(historyModule, historyTurn);
+                });
+            });
         });
     });
-})(window.io, window.jQuery, window.swal);
+})(window.io, window.jQuery, window.swal, window._);
