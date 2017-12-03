@@ -69,6 +69,8 @@
                     <td width="70%" class="modulo">Módulo: <span>'+element.window+'</span></td>\
                 </tr>'); 
             });
+            var sound = document.getElementById("audio");
+            sound.play();
         };
         // Use callback with functions
         getCurrentTurn(function(payload) {
@@ -121,8 +123,6 @@
                 ) {
                     $('.turno-activo-codigo').text(payload.documentFound.group + ' ' + payload.documentFound.counter);
                     $('.turno-activo-modulo span').text(payload.documentFound.window);
-                    var sound = document.getElementById("audio");
-                    sound.play();
                 }
             }
         });
