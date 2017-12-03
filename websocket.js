@@ -123,17 +123,20 @@ io.on('connection', (client) => {
         latests.exec((err, documentsFound) => {
             if (err) return handleError(err);
             console.log('request-turn | latests:', documentsFound);
+            const latestTurn = documentsFound[documentsFound.length - 1];
             // Latest
-            TurnModel.findByIdAndUpdate(documentsFound[documentsFound.length - 1]._id, {
+            if ( typeof latestTurn !== "undefined" ) {
+                TurnModel.findByIdAndUpdate(latestTurn._id, {
                     username: payload.windowUsername,
                     window: payload.windowId,
-            }, {
-                new: true
-            }, function (err, documentFound) {
-                if (err) return handleError(err);
-                console.log('request-turn | documentFound:', documentFound);
-                io.emit('set-requested-turn', {documentFound});
-            });
+                }, {
+                    new: true
+                }, function (err, documentFound) {
+                    if (err) return handleError(err);
+                    console.log('request-turn | documentFound:', documentFound);
+                    io.emit('set-requested-turn', {documentFound});
+                });
+            }
         });
     });
     /**
