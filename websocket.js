@@ -251,7 +251,7 @@ io.on('connection', (client) => {
     /**
      * Screen App: Get the latest turns
      */
-    client.on('get-latest-turns', (payload) => {
+    client.on('get-latests-turns', (payload) => {
         // Get the latest turn
         const start = new Date();
         start.setHours(0,0,0,0);
@@ -262,10 +262,11 @@ io.on('connection', (client) => {
         };
         const latests = TurnModel.find(query)
             .where('window').ne(0)
-            .sort({'updatedAt': -1});
+            .sort({'updatedAt': -1})
+            .limit(6);
         latests.exec((err, documentsFound) => {
-            console.log('get-latest-turns | documentsFound:', documentsFound);
-            io.sockets.emit('set-latest-turns', {documentsFound});
+            console.log('get-latests-turns | documentsFound:', documentsFound);
+            io.sockets.emit('set-latests-turns', {documentsFound});
         });
     });
 });
