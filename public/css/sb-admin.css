@@ -111,6 +111,35 @@ body.fixed-nav {
   line-height:0.5;
 }
 
+.turno-historial{
+  background-color:#53B847;
+  border:5px #eee solid; 
+  color:#fff;
+  width:250px;
+  height:370px;
+  position:absolute;
+  z-index:1;
+  top:170px;
+  right:109px;
+  padding:5px;
+  text-align:center;
+  line-height:1.5;
+  font-size:19px;
+}
+.turno-historial .title{
+  font-size:1.4em;
+  font-weight:400;
+  line-height:2em; 
+}
+.turno-historial .codigos{
+  color:#ffea2c;
+  font-size:1.8em; 
+}
+.turno-historial .modulo{
+  color:#fff;
+  font-size:26px;
+}
+
 body.sidenav-toggled .turno-siguiente,
 body.sidenav-toggled .turno-anterior{ right:150px; }
 
