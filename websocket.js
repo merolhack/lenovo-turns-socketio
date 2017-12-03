@@ -124,7 +124,7 @@ io.on('connection', (client) => {
             if (err) return handleError(err);
             console.log('request-turn | latests:', documentsFound);
             if (documentsFound.length == 0) {
-                io.emit('set-requested-turn', {documentFound: null});
+                io.emit('set-requested-turn', {documentFound: null, window: payload.windowId});
             } else {
                 const latestTurn = documentsFound[documentsFound.length - 1];
                 // Latest
