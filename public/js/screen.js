@@ -64,6 +64,26 @@
         });
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
+            getNextTurn(function(payload) {
+                console.log('getNextTurn:', payload);
+                if (typeof payload !== "undefined" && payload.document !== null) {
+                    $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
+                    $('.turno-siguiente .modulo span').text(payload.document.window);
+                } else {
+                    $('.turno-siguiente .codigo').text('');
+                    $('.turno-siguiente .modulo span').text('');
+                }
+            });
+            getPreviousTurn(function(payload) {
+                console.log('getPreviousTurn:', payload);
+                if (typeof payload !== "undefined" && payload.document !== null) {
+                    $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
+                    $('.turno-anterior .modulo span').text(payload.document.window);
+                } else {
+                    $('.turno-anterior .codigo').text('');
+                    $('.turno-anterior .modulo span').text('');
+                }
+            });
             if (payload.documentFound === null) {
                 $('.turno-activo-codigo').text('');
                 $('.turno-activo-modulo span').text('');
@@ -81,26 +101,6 @@
                     var sound = document.getElementById("audio");
                     sound.play();
                 }
-            }
-        });
-        getNextTurn(function(payload) {
-            console.log('getNextTurn:', payload);
-            if (typeof payload !== "undefined" && payload.document !== null) {
-                $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
-                $('.turno-siguiente .modulo span').text(payload.document.window);
-            } else {
-                $('.turno-siguiente .codigo').text('');
-                $('.turno-siguiente .modulo span').text('');
-            }
-        });
-        getPreviousTurn(function(payload) {
-            console.log('getPreviousTurn:', payload);
-            if (typeof payload !== "undefined" && payload.document !== null) {
-                $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
-                $('.turno-anterior .modulo span').text(payload.document.window);
-            } else {
-                $('.turno-anterior .codigo').text('');
-                $('.turno-anterior .modulo span').text('');
             }
         });
         getTurnCompleted(function(payload) {
