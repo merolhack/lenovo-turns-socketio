@@ -3,6 +3,7 @@
  * Jimp: Create image
  * Printer: Send an image to the printer
  */
+const fs = require('fs');
 const path = require("path");
 const Jimp = require("jimp");
 const printer = require('printer');
@@ -43,7 +44,7 @@ const createTurn = (turn, query, io, payload) => {
                 })
                 .then(function (font) {
                     const temporalFileName = path.join(temporalDirectory, uuid.v1()) + '.jpg';
-                    console.log('temporalFileName:', temporalFileName);
+                    console.log('Generated image file: temporalFileName:', temporalFileName);
                     loadedImage.print(font, 46, 110, imageCaption2)
                                 .write(temporalFileName);
             
@@ -55,8 +56,22 @@ const createTurn = (turn, query, io, payload) => {
                     //const date = ucwords(moment(new Date).format("dd, MMMM D YYYY, h:mm:ss a"));
                     loadedImage.print(font, 60, 185, date)
                             .write(temporalFileName);
+                    // Check if the file exists
+                    fs.stat(temporalFileName, function(err, stat) {
+                        if(err == null) {
+                            cmd.run(`mspaint /pt ${temporalFileName} EC-80330`);
+                            // Delete the file after 10 seconds
+                            setTimeout(() => {
+                                fs.unlink(temporalFileName, (error) => {
+                                    console.log(`successfully deleted ${temporalFileName}`);
+                                });
+                            }, 10000);
+                        } else if(err.code == 'ENOENT') {
+                            // file does not exist
+                            fs.appendFile('log.txt', 'The file '+temporalFileName+' does not exists\n');
+                        }
+                    });
                     
-                    cmd.run(`mspaint /pt ${temporalFileName} EC-80330`);
                     /*printer.printDirect({
                         data: temporalFileName,
                         type: 'JPEG',
