@@ -47,14 +47,6 @@
             socket.emit('get-latests-turns', {});
             socket.on('set-latests-turns', (payload) => cb(payload));
         }
-        /*function getNextTurn(cb) {
-            socket.emit('get-next-turn', {});
-            socket.on('set-next-turn', (payload) => cb(payload));
-        }
-        function getPreviousTurn(cb) {
-            socket.emit('get-previous-turn', {});
-            socket.on('set-previous-turn', (payload) => cb(payload));
-        }*/
         function getTurnCompleted(cb) {
             socket.on('turn-completed', (payload) => cb(payload));
         };
@@ -69,8 +61,7 @@
                     <td width="70%" class="modulo">Módulo: <span>'+element.window+'</span></td>\
                 </tr>'); 
             });
-            var sound = document.getElementById("audio");
-            sound.play();
+            $.playSound('/audio/beep-07.wav');
         };
         // Use callback with functions
         getCurrentTurn(function(payload) {
@@ -81,31 +72,10 @@
                 console.log('latestPayload:', latestPayload);
                 updateTable(latestPayload);
             });
-            var sound = document.getElementById("audio");
-            sound.play();
+            $.playSound('/audio/beep-07.wav');
         });
         subscribeToCurrentTurn(function(err, payload) {
             console.log('currentTurn:', payload);
-            /*getNextTurn(function(payload) {
-                console.log('getNextTurn:', payload);
-                if (typeof payload !== "undefined" && payload.document !== null) {
-                    $('.turno-siguiente .codigo').text(payload.document.group + ' ' + payload.document.counter);
-                    $('.turno-siguiente .modulo span').text(payload.document.window);
-                } else {
-                    $('.turno-siguiente .codigo').text('');
-                    $('.turno-siguiente .modulo span').text('');
-                }
-            });
-            getPreviousTurn(function(payload) {
-                console.log('getPreviousTurn:', payload);
-                if (typeof payload !== "undefined" && payload.document !== null) {
-                    $('.turno-anterior .codigo').text(payload.document.group + ' ' + payload.document.counter);
-                    $('.turno-anterior .modulo span').text(payload.document.window);
-                } else {
-                    $('.turno-anterior .codigo').text('');
-                    $('.turno-anterior .modulo span').text('');
-                }
-            });*/
             getLatestTurn(function(latestPayload) {
                 updateTable(latestPayload);
             });
@@ -129,8 +99,6 @@
         getTurnCompleted(function(payload) {
             console.log('setTurnCompleted:', payload);
             socket.emit('get-turn', {});
-            //socket.emit('get-next-turn', {});
-            //socket.emit('get-previous-turn', {});
             getLatestTurn(function(latestPayload) {
                 updateTable(latestPayload);
             });

@@ -105,7 +105,6 @@ io.on('connection', (client) => {
      * Window App: Request a turn
      */
     client.on('request-turn', (payload) => {
-        console.log('request-turn | payload:', payload);
         // Get the latest turn with no window selected
         const start = new Date();
         start.setHours(0,0,0,0);
